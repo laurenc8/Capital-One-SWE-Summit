@@ -1,0 +1,20 @@
+body {
+  max-width: 60em;
+  background-color: #282c34;
+  color: white;
+  transition: all 0.1s; /* elbow grease */
+}
+
+@media (prefers-color-scheme: light) {
+    body {
+        background-color: white;
+        color: black;
+    }
+}
+
+.App-header {
+}
+
+.App-link {
+  color: #61dafb;
+  }
