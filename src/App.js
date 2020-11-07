@@ -2,7 +2,6 @@ import React from 'react';
 import './App.css';
 
 const REQUEST = {
-    NOT_SENT: "NOT_SENT",
     SENT: "SENT",
     SUCCESS: "SUCCESS",
     FAILED: "FAILED"
@@ -10,13 +9,19 @@ const REQUEST = {
 
 
 function Item(props) {
-    return <p>{props.title}</p>
+    const date = new Date(props.publishedAt);
+    return <a href={props.url} target="_blank" rel="noreferrer" class="item">
+            <img src={props.urlToImage} alt="article background" class="bgimage" />
+            <p class="headline">{props.title}</p>
+            <p class="description">{props.description}</p>
+            <p class="info">Published {date.toLocaleDateString()} {date.toLocaleTimeString()}. From {props.source.name}, by {props.author} </p>
+        </a>
 }
 
 function Articles(props) {
     if (props.status === "ok") {
         if (props.articles.length === 0) {
-            <p>no articles</p>
+            return <p>no articles</p>
         } else {
             return <div>
           {props.articles.map(item => (<Item {...item} />))}
@@ -28,10 +33,8 @@ function Articles(props) {
 }
 
 function Status(props) {
-          return <div>{
-            (props.status === REQUEST.NOT_SENT) ?
-              <p>Not sent</p>
-          : (props.status === REQUEST.SENT) ?
+          return <div class="info" >{
+          (props.status === REQUEST.SENT) ?
               <p>loading</p>
           : (props.status === REQUEST.FAILED) ?
               <p>failed</p>
@@ -42,7 +45,23 @@ function Status(props) {
 }
 
 function Inputs(props) {
-    return <input type="text" value={props.q} onChange={e => props.handleparams({q: e.target.value})} />
+    const params = props.params;
+    const categories = {
+        entertainment: "Entertainment",
+        sports: "Sports",
+        technology: "Technology"
+    };
+    return <div>
+        <form onSubmit={props.handlesubmit} >
+        <span class="title-sub" >News.</span><br/>
+        <input class="title" type="text" placeholder="Everything." value={params.q} 
+            onChange={e => props.handleparams({q: e.target.value})} />
+        <select class="title" onChange={e => props.handleparams({category: e.target.value})} >
+        {Object.entries(categories).map(kv => <option selected={kv[0]===params.cateogory} value={kv[0]}>{kv[1]}</option>)}
+        </select><br/>
+        <input class="title-sub" style={{float: "right"}} type="submit" value="Gimme" />
+        </form>
+    </div>
 }
 
 class App extends React.Component {
@@ -50,9 +69,12 @@ class App extends React.Component {
         super(props);
         this.state = {
     params: {
-        q:"foo",
+        country: "us",
+        q:"",
+        category:"entertainment",
+        apiKey: "5b34f7dccfc3428d8a0884cab18d3529", // I know; would not do if I was actually paying for this
     },
-    request: REQUEST.NOT_SENT,
+    request: REQUEST.SENT,
     response: {
     "status": "ok",
     "totalResults": 38,
@@ -75,13 +97,20 @@ class App extends React.Component {
 };
     }
 
+    componentDidMount() {
+        this.getnews();
+    }
+
 
     getnews() {
         const url = "http://newsapi.org/v2/top-headlines?"
-        const params = Object.entries(this.state.params).map(kv => `${kv[0]}=${escape(kv[1])}`).join("&");
+        const params = Object.entries(this.state.params).filter(
+            kv => escape(kv[1]) !== "").map(
+            kv => `${kv[0]}=${escape(kv[1])}`).join("&");
         this.setState({...this.state, request: REQUEST.SENT});
-        fetch(url+params).then(response => {
-            this.setState({...this.state, request: REQUEST.SUCCESS, response});
+        fetch(url+params).then(response => {return response.json()}).then(json => {
+            console.log(json);
+            this.setState({...this.state, request: REQUEST.SUCCESS, response: json});
         }).catch(err => {
             this.setState({...this.state, request: REQUEST.FAILED})
         });
@@ -92,8 +121,8 @@ class App extends React.Component {
             this.setState({...this.state, params: {...this.state.params, ...p}})};
       return (
         <div className="App">
-          <header className="App-header">
-          <Inputs {...{...this.state.params, handleparams }} />
+          <header className="header">
+          <Inputs params={this.state.params} handleparams={handleparams} handlesubmit={e => {e.preventDefault(); this.getnews()} } />
           </header>
           <Status status={this.state.request} />
           <Articles {...this.state.response} />

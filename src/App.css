@@ -1,8 +1,10 @@
 body {
-  max-width: 60em;
-  background-color: #282c34;
-  color: white;
-  transition: all 0.1s; /* elbow grease */
+    width: 90%;
+    max-width: 60em;
+    margin: 2em auto;
+    background-color: #282c34;
+    color: white;
+    transition: all 0.1s; /* elbow grease */
 }
 
 @media (prefers-color-scheme: light) {
@@ -10,11 +12,51 @@ body {
         background-color: white;
         color: black;
     }
+    .bgimage {
+        filter: blur(.1em) contrast(20%) brightness(180%) !important;
+    }
 }
 
-.App-header {
+.header {
+    display: flex;
+}
+.title-sub {
+    font-size: 1.5em;
+    background: none;
+    color: inherit;
+}
+.title {
+    width: 100%;
+    font-size: 2em;
+    font-weight: 100;
+    background: inherit;
+    color: inherit;
+    flex-grow: 0;
+    text-align: center;
 }
 
-.App-link {
-  color: #61dafb;
-  }
+.item {
+    display: inline-block;
+    padding: .2em;
+    color: inherit;
+    text-decoration: none;
+    position: relative;
+    overflow: hidden;
+}
+.bgimage {
+    position: absolute;
+    top: -2%;
+    left: -2%;
+    width: 104%;
+    height: auto;
+    z-index: -1;
+    filter: blur(.1em) contrast(20%) brightness(40%);
+}
+.info {
+    font-size: .8em;
+    text-align: right;
+}
+
+.title {
+    font-weight: bold;
+}
